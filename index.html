@@ -1,0 +1,2543 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FLEX STORE</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050507;
+    --bg-2: #0c0c12;
+    --bg-3: #14141c;
+    --surface: #1a1a24;
+    --surface-hover: #22222e;
+    --border: rgba(255,255,255,0.04);
+    --border-2: rgba(255,255,255,0.08);
+    --text: #e8e8ee;
+    --text-2: #9a9aaa;
+    --text-3: #5a5a6a;
+    --accent: #ff6b35;
+    --accent-2: #f7931e;
+    --accent-glow: rgba(255,107,53,0.15);
+    --success: #00d084;
+    --danger: #ff4757;
+    --price: #ffd700;
+    --cyan: #00d4ff;
+    --purple: #a855f7;
+  }
+  [data-theme="light"] {
+    --bg: #f5f5f7;
+    --bg-2: #ffffff;
+    --bg-3: #f0f0f4;
+    --surface: #ffffff;
+    --surface-hover: #f8f8fc;
+    --border: rgba(0,0,0,0.06);
+    --border-2: rgba(0,0,0,0.1);
+    --text: #1a1a2e;
+    --text-2: #6b6b7b;
+    --text-3: #9a9aaa;
+    --accent-glow: rgba(255,107,53,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+    overflow-x: hidden;
+    transition: background 0.4s, color 0.4s;
+  }
+  .video-bg {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -2; object-fit: cover;
+  }
+  .video-overlay {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    background: var(--bg);
+    opacity: 0.85;
+    transition: background 0.4s;
+  }
+  .noise {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  header {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 0 20px;
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    transition: all 0.3s;
+  }
+  header.scrolled {
+    background: rgba(5,5,7,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  [data-theme="light"] header.scrolled {
+    background: rgba(245,245,247,0.85);
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px; font-weight: 700;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .logo-mark::after {
+    content: ''; position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 3s infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+  }
+  .logo-text {
+    font-size: 19px; font-weight: 700;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+  .logo-text span {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+  }
+  .theme-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border-2);
+    background: var(--surface);
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .theme-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .cart-wrap {
+    position: relative;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-2);
+    background: var(--surface);
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .cart-wrap:hover {
+    border-color: var(--accent);
+  }
+  .cart-wrap i {
+    font-size: 15px;
+    color: var(--text-2);
+  }
+  .cart-wrap:hover i { color: var(--accent); }
+  .cart-label {
+    font-size: 12px; font-weight: 500;
+    color: var(--text-2);
+  }
+  .cart-wrap:hover .cart-label { color: var(--accent); }
+  .cart-badge {
+    position: absolute; top: -4px; right: -4px;
+    min-width: 18px; height: 18px;
+    padding: 0 5px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px; font-weight: 700;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color 0.2s;
+    position: relative;
+    cursor: pointer;
+  }
+  .nav-links a:hover {
+    color: var(--accent);
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.2s;
+  }
+  .nav-links a:hover::after {
+    width: 100%;
+  }
+
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 100px 24px 60px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 20%; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: 100px;
+    font-size: 12px; font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hero-tag i {
+    font-size: 8px;
+    color: var(--success);
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero h1 {
+    font-size: clamp(30px, 6vw, 60px);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+    max-width: 800px;
+  }
+  .hero h1 .line {
+    display: block;
+  }
+  .hero h1 .line.accent {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-desc {
+    font-size: 16px;
+    color: var(--text-2);
+    max-width: 460px;
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+  .hero-cta {
+    display: flex; gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-glow {
+    padding: 12px 26px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .btn-glow::before {
+    content: ''; position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  .btn-glow:hover::before { left: 100%; }
+  .btn-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(255,107,53,0.3);
+  }
+  .btn-ghost {
+    padding: 12px 26px;
+    border: 1px solid var(--border-2);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--surface-hover);
+  }
+  .btn-home {
+    padding: 8px 18px;
+    border: 1px solid var(--border-2);
+    border-radius: 8px;
+    background: var(--bg-2);
+    color: var(--text-2);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-home:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--surface-hover);
+  }
+
+  .marquee-wrap {
+    overflow: hidden;
+    padding: 18px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+  .marquee {
+    display: flex;
+    gap: 36px;
+    animation: marquee 28s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 500;
+    color: var(--text-3);
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .marquee-item i {
+    font-size: 7px;
+    color: var(--accent);
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .section {
+    padding: 70px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .section-head {
+    margin-bottom: 40px;
+  }
+  .section-head h2 {
+    font-size: clamp(24px, 3.5vw, 38px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .section-head h2 span {
+    color: var(--accent);
+  }
+  .section-head p {
+    font-size: 15px;
+    color: var(--text-2);
+    max-width: 480px;
+  }
+  .section-head .nav-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .stats-hero {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 50px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    position: relative;
+    flex-wrap: wrap;
+  }
+  .stats-hero::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 50%;
+    transform: translateX(-50%);
+    width: 160px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(30px, 4vw, 42px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -1.5px;
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+  }
+  .product {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  .product::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .product:hover::before { opacity: 1; }
+  .product:hover {
+    border-color: var(--border-2);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px var(--border-2);
+  }
+  [data-theme="light"] .product:hover {
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 0 0 1px var(--border-2);
+  }
+  .product-img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255,107,53,0.05), rgba(247,147,30,0.03));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .product-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .product-img .fallback-icon {
+    font-size: 40px;
+    color: var(--text-3);
+    opacity: 0.3;
+    position: absolute;
+  }
+  .product:hover .product-img img { transform: scale(1.06); }
+  .product-img .badge {
+    position: absolute;
+    top: 14px; left: 14px;
+    padding: 4px 12px;
+    background: rgba(5,5,7,0.8);
+    backdrop-filter: blur(12px);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    border: 1px solid var(--border-2);
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 2;
+  }
+  .product-body {
+    padding: 20px;
+  }
+  .product-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .product-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+    margin-bottom: 6px;
+  }
+  .product-desc {
+    font-size: 13px;
+    color: var(--text-3);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .product-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .product-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--price);
+  }
+  .product-price .currency {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-3);
+    margin-left: 4px;
+  }
+  .product-buy {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .product-buy:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(255,107,53,0.3);
+  }
+  .product-buy i { font-size: 11px; }
+
+  .features-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 50px;
+  }
+  .feature-box {
+    padding: 24px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .feature-box:hover {
+    border-color: var(--border-2);
+    transform: translateY(-3px);
+  }
+  .feature-icon {
+    width: 44px; height: 44px;
+    margin: 0 auto 12px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: #fff;
+  }
+  .feature-box h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .feature-box p {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.5;
+  }
+
+  .about-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 48px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 160px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .about-block h2 {
+    font-size: clamp(26px, 3.5vw, 36px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+  }
+  .about-block h2 span { color: var(--accent); }
+  .about-block p {
+    font-size: 15px;
+    color: var(--text-2);
+    max-width: 540px;
+    margin: 0 auto 24px;
+    line-height: 1.7;
+  }
+  .about-block .btn-glow,
+  .about-block .btn-ghost {
+    font-size: 13px;
+    padding: 10px 22px;
+  }
+
+  .faq-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .faq {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .faq:hover { border-color: var(--border-2); }
+  .faq-q {
+    width: 100%;
+    padding: 18px 24px;
+    background: none; border: none;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+  .faq-q i {
+    font-size: 13px;
+    color: var(--text-3);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    margin-left: 14px;
+  }
+  .faq.open .faq-q i { transform: rotate(180deg); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  .faq.open .faq-a {
+    max-height: 200px;
+    padding: 0 24px 18px;
+  }
+  .faq-a p {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .support-box {
+    max-width: 680px;
+    margin: 28px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .support-icon {
+    width: 50px; height: 50px;
+    min-width: 50px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    color: #fff;
+  }
+  .support-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .support-info p {
+    font-size: 13px;
+    color: var(--text-2);
+    margin-bottom: 8px;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 24px 28px;
+  }
+  .footer-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr 1fr;
+    gap: 40px;
+  }
+  .footer-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    margin-bottom: 12px;
+  }
+  .footer-brand .logo-mark {
+    width: 34px; height: 34px;
+    font-size: 15px;
+  }
+  .footer-brand span { color: var(--accent); }
+  .footer-desc {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .footer-socials {
+    display: flex; gap: 8px;
+  }
+  .footer-social {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border-2);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-3);
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.2s;
+  }
+  .footer-social:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--surface-hover);
+  }
+  .footer-col h4 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-3);
+    margin-bottom: 14px;
+  }
+  .footer-col a {
+    display: block;
+    font-size: 13px;
+    color: var(--text-2);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .footer-col a:hover { color: var(--accent); }
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 32px auto 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-3);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-bg {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(12px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+  }
+  .modal-bg.active { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 18px;
+    max-width: 440px;
+    width: 100%;
+    position: relative;
+    animation: modalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  .modal-box.wide {
+    max-width: 540px;
+  }
+  @keyframes modalPop {
+    from { transform: scale(0.92) translateY(16px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .modal-close {
+    position: absolute; top: 10px; right: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--text-3);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-close:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .modal-box h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    padding-right: 30px;
+  }
+  .modal-box .sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-bottom: 14px;
+  }
+
+  .order-history-item {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .order-history-item .oh-product {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .order-history-item .oh-meta {
+    font-size: 12px;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .order-history-item .oh-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .order-history-item .oh-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--price);
+  }
+  .order-history-item .oh-proof {
+    margin-top: 6px;
+    width: 100%;
+  }
+  .order-history-item .oh-proof img {
+    max-width: 100px;
+    border-radius: 6px;
+    border: 1px solid var(--border-2);
+    cursor: pointer;
+  }
+  .empty-cart {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-3);
+  }
+  .empty-cart i {
+    font-size: 40px;
+    color: var(--text-3);
+    margin-bottom: 12px;
+    display: block;
+  }
+  .empty-cart p {
+    font-size: 14px;
+  }
+
+  .summary-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+  .summary-row + .summary-row {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+  .summary-row .lbl { color: var(--text-3); }
+  .summary-row .val { font-weight: 600; }
+  .summary-row.total .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--price);
+  }
+
+  .qr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .qr-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+  }
+  .qr-card .qr-lbl {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .qr-card .qr-img {
+    width: 100%;
+    max-width: 100px;
+    margin: 0 auto 6px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-2);
+    background: #fff;
+  }
+  .qr-card .qr-img img {
+    width: 100%;
+    display: block;
+  }
+  .qr-card .qr-addr {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-2);
+    word-break: break-all;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .qr-card .qr-addr:hover { color: var(--accent); }
+  .qr-card .copy-tip {
+    font-size: 8px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+
+  .upload-zone {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 130px;
+    border: 2px dashed var(--border-2);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-2);
+  }
+  .upload-zone:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .upload-zone.has-img {
+    border-style: solid;
+    border-color: var(--success);
+    border-width: 1px;
+  }
+  .upload-zone img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    position: absolute; top: 0; left: 0;
+  }
+  .upload-zone i {
+    font-size: 20px;
+    color: var(--text-3);
+  }
+  .upload-zone .up-text {
+    font-size: 11px;
+    color: var(--text-2);
+    text-align: center;
+  }
+  .upload-zone .up-text small {
+    display: block;
+    font-size: 9px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+  .upload-zone input[type="file"] {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0; cursor: pointer;
+  }
+
+  .field {
+    margin-bottom: 12px;
+  }
+  .field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-2);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    transition: all 0.2s;
+    outline: none;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .field input::placeholder { color: var(--text-3); }
+  .field select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a5a6a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .field select option {
+    background: var(--bg-2);
+    color: var(--text);
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--success), #00b068);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .submit-btn:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 20px rgba(0,208,132,0.25);
+  }
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .submit-btn .spin {
+    display: none;
+    width: 14px; height: 14px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .submit-btn.loading .spin { display: block; }
+  .submit-btn.loading .txt { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .success-bg {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px;
+    text-align: center;
+  }
+  .success-bg.active { display: flex; }
+  .success-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--success), #00b068);
+    display: flex; align-items: center; justify-content: center;
+    animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+  .success-circle i {
+    font-size: 24px;
+    color: #fff;
+  }
+  .success-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--success);
+  }
+  .success-msg {
+    font-size: 13px;
+    color: var(--text-2);
+    max-width: 320px;
+    line-height: 1.6;
+  }
+  .success-back {
+    padding: 10px 22px;
+    border: 1px solid var(--border-2);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .success-back:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .social-links {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 1px solid var(--border-2);
+    background: var(--surface);
+    color: var(--text-2);
+  }
+  .social-link:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .social-link.tiktok:hover {
+    border-color: #fe2c55;
+    color: #fe2c55;
+  }
+  .social-link.telegram:hover {
+    border-color: #0088cc;
+    color: #0088cc;
+  }
+
+  .tools-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .tool-card:hover::before { opacity: 1; }
+  .tool-card:hover {
+    border-color: var(--border-2);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.25);
+  }
+  .tool-card .tool-icon {
+    width: 48px; height: 48px;
+    margin: 0 auto 12px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    color: #fff;
+  }
+  .tool-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .tool-card p {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .tool-desc-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 32px;
+    margin-top: 28px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .back-btn {
+    padding: 8px 18px;
+    border: 1px solid var(--border-2);
+    border-radius: 8px;
+    background: var(--bg-2);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 10px;
+    margin-bottom: 18px;
+    transition: all 0.2s;
+  }
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .tool-desc-content {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-2);
+  }
+  .tool-desc-content h3 {
+    font-size: 22px;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .tool-desc-content .tool-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .login-box {
+    max-width: 380px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .login-box .login-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 20px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    color: #fff;
+  }
+  .login-box h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .login-box p {
+    font-size: 13px;
+    color: var(--text-3);
+    margin-bottom: 20px;
+  }
+
+  .orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .orders-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .orders-header .header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .orders-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-card .lbl {
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .order-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto auto auto auto;
+    gap: 12px;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  .order-item:hover {
+    border-color: var(--border-2);
+  }
+  .order-item .o-product {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .order-item .o-qty {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-3);
+    background: var(--bg-2);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .order-item .o-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--price);
+  }
+  .order-item .o-tg {
+    font-size: 12px;
+    color: var(--text-2);
+  }
+  .order-item .o-date {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .order-item .o-proof {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .order-item .o-proof img {
+    max-width: 160px;
+    border-radius: 6px;
+    border: 1px solid var(--border-2);
+    cursor: pointer;
+  }
+  .no-orders {
+    text-align: center;
+    padding: 40px 16px;
+    color: var(--text-3);
+    font-size: 14px;
+  }
+
+  /* ===== MEDIA QUERIES ===== */
+  @media (max-width: 768px) {
+    header { padding: 0 12px; height: 56px; }
+    .logo-text { font-size: 16px; }
+    .logo-mark { width: 32px; height: 32px; font-size: 14px; }
+    .cart-label { display: none; }
+    .nav-links { display: none; }
+    .section { padding: 40px 14px; }
+    .hero { padding: 72px 14px 32px; }
+    .hero h1 { font-size: 26px; letter-spacing: -1px; }
+    .hero-desc { font-size: 14px; }
+    .stats-hero { gap: 20px; }
+    .stat-num { font-size: 22px; }
+    .products-grid { grid-template-columns: 1fr; }
+    .features-row { grid-template-columns: 1fr 1fr; }
+    .about-block { padding: 24px 16px; }
+    .about-block h2 { font-size: 20px; }
+    .support-box { flex-direction: column; text-align: center; padding: 18px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 20px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .social-links { flex-direction: column; align-items: center; }
+    .tools-selector { grid-template-columns: 1fr; }
+    .orders-stats { grid-template-columns: repeat(2, 1fr); }
+    .order-item { grid-template-columns: 1fr; gap: 6px; }
+    .orders-header { flex-direction: column; align-items: flex-start; }
+    .section-head .nav-actions { flex-direction: column; }
+    .order-history-item { flex-direction: column; align-items: stretch; }
+    .tool-desc-panel { padding: 18px 14px; }
+    .login-box { padding: 24px 18px; }
+
+    .modal-bg { padding: 8px; }
+    .modal-box {
+      padding: 16px 14px;
+      max-width: 100%;
+      border-radius: 14px;
+      max-height: 95vh;
+    }
+    .modal-box h2 { font-size: 16px; }
+    .modal-box .sub { font-size: 11px; margin-bottom: 12px; }
+    .modal-close { top: 8px; right: 8px; width: 28px; height: 28px; font-size: 14px; }
+    .qr-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .qr-card { padding: 8px; }
+    .qr-card .qr-img { max-width: 80px; }
+    .qr-card .qr-addr { font-size: 8px; }
+    .summary-box { padding: 10px 12px; }
+    .summary-row { font-size: 12px; }
+    .summary-row.total .val { font-size: 15px; }
+    .upload-zone { max-height: 110px; }
+    .upload-zone .up-text { font-size: 10px; }
+    .field input, .field select { font-size: 12px; padding: 6px 10px; }
+    .submit-btn { padding: 8px; font-size: 12px; }
+    .modal-box.wide { max-width: 100%; }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+    .features-row { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<video class="video-bg" autoplay muted loop playsinline>
+  <source src="flex-store-bg.mp4" type="video/mp4">
+</video>
+<div class="video-overlay"></div>
+<div class="noise"></div>
+
+<header id="header">
+  <a href="#" class="logo" onclick="showHome(); return false;">
+    <div class="logo-mark">F</div>
+    <div class="logo-text">FLEX <span>STORE</span></div>
+  </a>
+  <div class="nav-links">
+    <a onclick="showHome(); setTimeout(()=>document.getElementById('catalog').scrollIntoView({behavior:'smooth'}),100);">Catalog</a>
+    <a onclick="showAboutTools();">About Tools</a>
+    <a onclick="showHome(); setTimeout(()=>document.getElementById('youtube').scrollIntoView({behavior:'smooth'}),100);">YouTube</a>
+    <a onclick="showOwnerPanel();">Owner Panel</a>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
+      <i class="fa-solid fa-moon" id="themeIcon"></i>
+    </button>
+    <div class="cart-wrap" onclick="openCartModal()">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span class="cart-label">Cart</span>
+      <span class="cart-badge" id="cartCount">0</span>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="heroSection">
+  <div class="hero-tag">
+    <i class="fa-solid fa-circle"></i> All Systems Operational
+  </div>
+  <h1>
+    <span class="line">Premium Digital</span>
+    <span class="line accent">Tools &amp; Checkers</span>
+  </h1>
+  <p class="hero-desc">Professional-grade software delivered instantly. No waiting, no hassle &mdash; just results.</p>
+  <div class="hero-cta">
+    <a class="btn-glow" onclick="showHome(); setTimeout(()=>document.getElementById('catalog').scrollIntoView({behavior:'smooth'}),100);">
+      <i class="fa-solid fa-compass"></i> Explore Catalog
+    </a>
+    <a class="btn-ghost" onclick="showAboutTools();">
+      <i class="fa-solid fa-circle-info"></i> About Tools
+    </a>
+  </div>
+  <div class="stats-hero">
+    <div class="stat-item">
+      <div class="stat-num" id="statSold">0</div>
+      <div class="stat-label">Products Sold</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statCust">0</div>
+      <div class="stat-label">Happy Customers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">99%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap" id="marqueeWrap">
+  <div class="marquee">
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Xray Checker</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Hotmail Checker</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Xbox Pass</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Minecraft</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Netflix</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Crunchyroll</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> PSN</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Cookies Pack</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Xray Checker</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Hotmail Checker</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Xbox Pass</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Minecraft</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Netflix</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Crunchyroll</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> PSN</div>
+    <div class="marquee-item"><i class="fa-solid fa-circle"></i> Cookies Pack</div>
+  </div>
+</div>
+
+<!-- HOME SECTIONS -->
+<section class="section" id="homeFeatures">
+  <div class="section-head">
+    <h2>Why choose <span>FLEX</span></h2>
+    <p>Built for speed, security, and reliability. Every tool is tested before it hits the shelf.</p>
+  </div>
+  <div class="features-row">
+    <div class="feature-box">
+      <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+      <h3>Instant Delivery</h3>
+      <p>Your product arrives the second payment clears. No delays.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3>Secure Payments</h3>
+      <p>End-to-end encrypted transactions via crypto.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon"><i class="fa-solid fa-headset"></i></div>
+      <h3>Real Support</h3>
+      <p>Human support team. No bots, no automated replies.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon"><i class="fa-solid fa-star"></i></div>
+      <h3>Verified Quality</h3>
+      <p>Every review comes from a real completed purchase.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="catalog">
+  <div class="section-head">
+    <h2>Product <span>Catalog</span></h2>
+    <p>Browse our collection of premium checkers and tools.</p>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<section class="section" id="about">
+  <div class="about-block">
+    <h2>About <span>FLEX STORE</span></h2>
+    <p>We are a small team obsessed with one thing: delivering high-quality digital tools fast, safely, and with real humans behind every order. Every review you see here is from a verified purchase.</p>
+    <a class="btn-glow" onclick="showHome(); setTimeout(()=>document.getElementById('catalog').scrollIntoView({behavior:'smooth'}),100);">
+      <i class="fa-solid fa-compass"></i> Browse Catalog
+    </a>
+    <a class="btn-ghost" style="margin-left:12px;" onclick="showAboutTools();">
+      <i class="fa-solid fa-circle-info"></i> Learn About Tools
+    </a>
+    <div class="social-links">
+      <a href="https://www.tiktok.com/@flexe34" target="_blank" class="social-link tiktok">
+        <i class="fa-brands fa-tiktok"></i> TikTok: @flexe34
+      </a>
+      <a href="https://t.me/Flex8383" target="_blank" class="social-link telegram">
+        <i class="fa-brands fa-telegram"></i> Telegram: @Flex8383
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faqSection">
+  <div class="section-head">
+    <h2>Common <span>Questions</span></h2>
+    <p>Everything you need to know before ordering.</p>
+  </div>
+  <div class="faq-grid">
+    <div class="faq">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        How fast is delivery?
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <div class="faq-a"><p>Orders are delivered automatically within seconds of payment confirmation. No waiting required.</p></div>
+    </div>
+    <div class="faq">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What payment methods do you accept?
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <div class="faq-a"><p>We currently accept Bitcoin (BTC) and Litecoin (LTC). More cryptocurrencies coming soon.</p></div>
+    </div>
+    <div class="faq">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What if something goes wrong?
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <div class="faq-a"><p>Open a support ticket and a real person will get back to you within 24 hours.</p></div>
+    </div>
+  </div>
+  <div class="support-box">
+    <div class="support-icon"><i class="fa-solid fa-headset"></i></div>
+    <div class="support-info">
+      <h3>Still have questions?</h3>
+      <p>Our support team is here to help.</p>
+      <a href="https://t.me/Flex8383" target="_blank" class="btn-glow">
+        <i class="fa-brands fa-telegram"></i> Contact Support &rarr;
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT TOOLS PAGE -->
+<section class="section" id="about-tools" style="display:none;">
+  <div class="section-head">
+    <h2>About <span>Tools</span></h2>
+    <p>Select a tool below to learn more about what it does.</p>
+    <div class="nav-actions">
+      <button class="btn-home" onclick="showHome();">
+        <i class="fa-solid fa-house"></i> Back to Home
+      </button>
+    </div>
+  </div>
+
+  <div class="tools-selector" id="toolsSelector">
+    <div class="tool-card" onclick="showToolDesc('xray-checker')">
+      <div class="tool-icon"><i class="fa-solid fa-radiation"></i></div>
+      <h3>Xray Checker</h3>
+      <p>Check Hotmail, Balance, Minecraft, Xbox, Payment & Country</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('xbox-checker')">
+      <div class="tool-icon"><i class="fa-brands fa-xbox"></i></div>
+      <h3>Xbox Checker</h3>
+      <p>Check Xbox Game Pass & perks</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('minecraft')">
+      <div class="tool-icon"><i class="fa-solid fa-cube"></i></div>
+      <h3>Minecraft Checker</h3>
+      <p>Validate Minecraft accounts</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('hotmail')">
+      <div class="tool-icon"><i class="fa-solid fa-envelope"></i></div>
+      <h3>Hotmail Checker</h3>
+      <p>Check Outlook/Hotmail accounts</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('xbox-fetcher')">
+      <div class="tool-icon"><i class="fa-solid fa-gift"></i></div>
+      <h3>Xbox Code Fetcher</h3>
+      <p>Find Xbox gift codes in emails</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('netflix')">
+      <div class="tool-icon"><i class="fa-solid fa-film"></i></div>
+      <h3>Netflix Checker</h3>
+      <p>Find Netflix-linked accounts</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('inbox')">
+      <div class="tool-icon"><i class="fa-solid fa-inbox"></i></div>
+      <h3>Hotmail Inbox</h3>
+      <p>Scan inbox for 30+ services</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('cookies')">
+      <div class="tool-icon"><i class="fa-solid fa-cookie-bite"></i></div>
+      <h3>Cookies Checker</h3>
+      <p>Multi-platform cookie validation</p>
+    </div>
+    <div class="tool-card" onclick="showToolDesc('psn')">
+      <div class="tool-icon"><i class="fa-brands fa-playstation"></i></div>
+      <h3>PSN Checker</h3>
+      <p>Check PlayStation accounts</p>
+    </div>
+  </div>
+
+  <div class="tool-desc-panel" id="toolDescPanel" style="display:none;">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
+      <button class="back-btn" onclick="hideToolDesc()"><i class="fa-solid fa-arrow-left"></i> Back to Tools</button>
+      <button class="btn-home" onclick="showHome();"><i class="fa-solid fa-house"></i> Home</button>
+    </div>
+    <div class="tool-desc-content" id="toolDescContent"></div>
+  </div>
+</section>
+
+<!-- OWNER PANEL -->
+<section class="section" id="owner-panel" style="display:none;">
+  <div class="login-box" id="ownerLogin">
+    <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
+    <h2>Owner Panel</h2>
+    <p>Enter password to access orders</p>
+    <div class="field">
+      <input type="password" id="ownerPass" placeholder="Password" onkeydown="if(event.key==='Enter')checkOwnerPass()">
+    </div>
+    <button class="submit-btn" onclick="checkOwnerPass()">
+      <i class="fa-solid fa-right-to-bracket"></i> Login
+    </button>
+    <div class="login-error" id="loginError" style="display:none;color:var(--danger);margin-top:10px;font-size:12px;">
+      <i class="fa-solid fa-triangle-exclamation"></i> Wrong password!
+    </div>
+  </div>
+
+  <div class="orders-panel" id="ordersPanel" style="display:none;">
+    <div class="orders-header">
+      <h2><i class="fa-solid fa-clipboard-list" style="color:var(--accent);"></i> All Orders</h2>
+      <div class="header-actions">
+        <button class="btn-home" onclick="showHome();">
+          <i class="fa-solid fa-house"></i> Home
+        </button>
+        <button class="btn-ghost" onclick="logoutOwner()">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+    <div class="orders-stats" id="ordersStats"></div>
+    <div class="orders-list" id="ordersList"></div>
+  </div>
+</section>
+
+<!-- YOUTUBE CHANNEL -->
+<section class="section" id="youtube">
+  <div class="about-block" style="background: linear-gradient(135deg, rgba(255,0,0,0.1), rgba(255,0,0,0.05)); border-color: rgba(255,0,0,0.2);">
+    <div style="width:60px;height:60px;margin:0 auto 16px;border-radius:50%;background:#ff0000;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;">
+      <i class="fa-brands fa-youtube"></i>
+    </div>
+    <h2>Subscribe to Our <span style="color:#ff0000;">YouTube</span></h2>
+    <p>Watch detailed video tutorials and demos of all our checkers and tools. See them in action before you buy!</p>
+    <a href="https://www.youtube.com/@flexstore" target="_blank" class="btn-glow" style="background: linear-gradient(135deg, #ff0000, #cc0000);">
+      <i class="fa-brands fa-youtube"></i> Subscribe Now
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="#" class="footer-brand" onclick="showHome(); return false;">
+        <div class="logo-mark">F</div>
+        FLEX <span>STORE</span>
+      </a>
+      <p class="footer-desc">Premium digital tools delivered instantly. Built for professionals who demand quality.</p>
+      <div class="footer-socials">
+        <a href="https://t.me/Flex8383" target="_blank" class="footer-social" title="Telegram">
+          <i class="fa-brands fa-telegram"></i>
+        </a>
+        <a href="https://www.tiktok.com/@flexe34" target="_blank" class="footer-social" title="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Navigation</h4>
+      <a onclick="showHome();">Home</a>
+      <a onclick="showHome(); setTimeout(()=>document.getElementById('catalog').scrollIntoView({behavior:'smooth'}),100);">Catalog</a>
+      <a onclick="showAboutTools();">About Tools</a>
+      <a onclick="showHome(); setTimeout(()=>document.getElementById('youtube').scrollIntoView({behavior:'smooth'}),100);">YouTube</a>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <a onclick="openCartModal();">My Orders</a>
+      <a onclick="showOwnerPanel();">Owner Panel</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#">Terms</a>
+      <a href="#">Privacy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>FLEX STORE &copy; 2026</span>
+    <span>Educational Purposes Only</span>
+  </div>
+</footer>
+
+<!-- PURCHASE MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <h2><i class="fa-solid fa-credit-card" style="color:var(--accent);margin-right:6px;"></i>Complete Purchase</h2>
+    <p class="sub">Send payment to one of the addresses below, then upload proof</p>
+
+    <div class="summary-box">
+      <div class="summary-row">
+        <span class="lbl">Product</span>
+        <span class="val" id="mProduct">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Quantity</span>
+        <span class="val" id="mQuantity">1</span>
+      </div>
+      <div class="summary-row total">
+        <span class="lbl">Total</span>
+        <span class="val" id="mPrice">-</span>
+      </div>
+    </div>
+
+    <div class="qr-grid">
+      <div class="qr-card">
+        <div class="qr-lbl"><i class="fa-brands fa-bitcoin" style="color:#f7931e;margin-right:4px;"></i>Bitcoin (BTC)</div>
+        <div class="qr-img">
+          <img src="btc-qr.png" alt="BTC QR" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style='color:var(--text-3);font-size:9px;padding:10px;display:block;text-align:center;font-family:JetBrains Mono'>BTC QR</span>'">
+        </div>
+        <div class="qr-addr" onclick="copyAddr(this, 'btc')" title="Click to copy">0x3b226e44dbabfbe6ca61d9ec4304f962cd4e6ad6</div>
+        <div class="copy-tip" id="btcTip">Click to copy</div>
+      </div>
+      <div class="qr-card">
+        <div class="qr-lbl"><i class="fa-solid fa-coins" style="color:#345d9d;margin-right:4px;"></i>Litecoin (LTC)</div>
+        <div class="qr-img">
+          <img src="ltc-qr.png" alt="LTC QR" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style='color:var(--text-3);font-size:9px;padding:10px;display:block;text-align:center;font-family:JetBrains Mono'>LTC QR</span>'">
+        </div>
+        <div class="qr-addr" onclick="copyAddr(this, 'ltc')" title="Click to copy">LNDxdY8XaC3xBqEDayx6W3Z89hov4hHkyt</div>
+        <div class="copy-tip" id="ltcTip">Click to copy</div>
+      </div>
+    </div>
+
+    <div class="upload-zone" id="upZone" onclick="document.getElementById('upFile').click()">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      <div class="up-text">
+        Upload Payment Proof<br>
+        <small>Click or drag image here</small>
+      </div>
+      <input type="file" id="upFile" accept="image/*" onchange="previewImg(event)">
+    </div>
+
+    <div class="field">
+      <label><i class="fa-solid fa-hashtag" style="margin-right:4px;"></i>Quantity</label>
+      <select id="orderQty" onchange="updateTotal()">
+        <option value="1">1x</option>
+        <option value="2">2x</option>
+        <option value="3">3x</option>
+        <option value="5">5x</option>
+        <option value="10">10x</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label><i class="fa-brands fa-telegram" style="margin-right:4px;"></i>Telegram Username</label>
+      <input type="text" id="tgUser" placeholder="@username">
+    </div>
+
+    <button class="submit-btn" id="sBtn" onclick="sendOrder()">
+      <span class="txt"><i class="fa-solid fa-paper-plane"></i> Confirm Order</span>
+      <span class="spin"></span>
+    </button>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal-bg" id="cartModal">
+  <div class="modal-box wide">
+    <button class="modal-close" onclick="closeCartModal()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <h2><i class="fa-solid fa-receipt" style="color:var(--accent);margin-right:8px;"></i>My Orders</h2>
+    <p class="sub">Your complete order history</p>
+    <div id="cartOrdersList"></div>
+  </div>
+</div>
+
+<div class="success-bg" id="success">
+  <div class="success-circle">
+    <i class="fa-solid fa-check"></i>
+  </div>
+  <div class="success-title">Order Submitted!</div>
+  <div class="success-msg">Your payment proof has been saved. We will contact you on Telegram if everything is correct.</div>
+  <button class="success-back" onclick="closeSuccess()">
+    <i class="fa-solid fa-arrow-left"></i> Back to Store
+  </button>
+</div>
+
+<audio id="buySound" preload="auto">
+  <source src="buy-click.wav" type="audio/wav">
+</audio>
+
+<script>
+// ===== PRODUCTS DATA =====
+const products = [
+  { id: 1, name: 'Xray Checker', desc: 'Check Hotmail, Balance, Minecraft, Xbox Codes, Payment & Country', price: 8, tag: 'Security', image: 'checker-xray.png' },
+  { id: 2, name: 'Xbox Game Pass Checker', desc: 'Check Xbox Game Pass subscription & perks', price: 5, tag: 'Gaming', image: 'checker-xbox.png' },
+  { id: 10, name: 'Xbox Code Fetcher', desc: 'Fetch and redeem Xbox game codes automatically', price: 4, tag: 'Gaming', image: 'fetcher-xbox.png' },
+  { id: 3, name: 'Minecraft Checker', desc: 'Validate Minecraft account ownership & type', price: 3, tag: 'Gaming', image: 'checker-minecraft.png' },
+  { id: 4, name: 'Netflix Hotmail Checker', desc: 'Find Netflix-linked Hotmail accounts', price: 8, tag: 'Streaming', image: 'checker-netflix.png' },
+  { id: 5, name: 'Crunchyroll Config', desc: 'Premium Crunchyroll account configuration and setup', price: 5, tag: 'Streaming', image: 'config-crunchyroll.png' },
+  { id: 6, name: 'Hotmail Pass Changer', desc: 'Automated password changer for Hotmail', price: 8, tag: 'Email', image: 'tool-passchanger.png' },
+  { id: 7, name: 'Hotmail Inbox', desc: 'Access and browse Hotmail inboxes with full read capabilities', price: 5, tag: 'Email', image: 'tool-inbox.png' },
+  { id: 8, name: 'PSN Checker', desc: 'Check PlayStation Network account details', price: 6, tag: 'Gaming', image: 'checker-psn.png' },
+  { id: 9, name: 'Cookies Checker Pack', desc: 'Multi-platform cookie validation suite', price: 10, tag: 'Utility', image: 'tool-cookies.png', sub: 'TikTok, eBay, Netflix, ChatGPT, Cursor, Claude, Prime Video' }
+];
+
+let cartCount = 0, currentProduct = null, walletFile = null, currentQty = 1;
+
+// Telegram Bot Config
+const TELEGRAM_BOT_TOKEN = '8627941860:AAGXCpqntLmY8Kccwc4Yg1HkxbN48u8nhxo';
+const TELEGRAM_CHAT_ID = '8203627328';
+
+// ===== THEME =====
+function toggleTheme() {
+  const h = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  if (h.getAttribute('data-theme') === 'light') {
+    h.removeAttribute('data-theme');
+    icon.className = 'fa-solid fa-moon';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    h.setAttribute('data-theme', 'light');
+    icon.className = 'fa-solid fa-sun';
+    localStorage.setItem('theme', 'light');
+  }
+}
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') {
+  document.documentElement.setAttribute('data-theme', 'light');
+  document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('header').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ===== STATS =====
+function animStats() {
+  const s = document.getElementById('statSold'), c = document.getElementById('statCust');
+  let n1 = 0, n2 = 0, t1 = 1247, t2 = 892;
+  const iv = setInterval(() => {
+    n1 += Math.ceil(t1 / 40); n2 += Math.ceil(t2 / 40);
+    if (n1 >= t1) { n1 = t1; clearInterval(iv); }
+    if (n2 >= t2) n2 = t2;
+    s.textContent = n1.toLocaleString(); c.textContent = n2.toLocaleString();
+  }, 30);
+}
+setTimeout(animStats, 600);
+
+// ===== NAVIGATION =====
+function showHome() {
+  document.querySelectorAll('.section').forEach(s => {
+    if (s.id !== 'about-tools' && s.id !== 'owner-panel') {
+      s.style.display = 'block';
+    } else {
+      s.style.display = 'none';
+    }
+  });
+  document.getElementById('heroSection').style.display = 'flex';
+  document.getElementById('marqueeWrap').style.display = 'block';
+  closeModal();
+  closeCartModal();
+  window.scrollTo(0, 0);
+  updateCartBadge();
+}
+
+function showAboutTools() {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('marqueeWrap').style.display = 'none';
+  document.getElementById('about-tools').style.display = 'block';
+  document.querySelector('.tools-selector').style.display = 'grid';
+  document.getElementById('toolDescPanel').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function showOwnerPanel() {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('marqueeWrap').style.display = 'none';
+  document.getElementById('owner-panel').style.display = 'block';
+  document.getElementById('ownerLogin').style.display = 'block';
+  document.getElementById('ordersPanel').style.display = 'none';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('ownerPass').value = '';
+  window.scrollTo(0, 0);
+}
+
+// ===== RENDER PRODUCTS =====
+function render() {
+  const g = document.getElementById('productsGrid');
+  g.innerHTML = '';
+  products.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'product';
+    d.style.opacity = '0';
+    d.style.transform = 'translateY(20px)';
+    d.style.transition = 'all 0.5s cubic-bezier(0.16,1,0.3,1)';
+    d.innerHTML = `
+      <div class="product-img">
+        <img src="${p.image}" alt="${p.name}" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-icon').style.display='flex';">
+        <i class="fa-solid fa-image fallback-icon" style="display:none;"></i>
+        <span class="badge">${p.tag}</span>
+      </div>
+      <div class="product-body">
+        <div class="product-title">${p.name}</div>
+        <div class="product-sub">${p.sub || ""}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-bottom">
+          <div class="product-price">$${p.price}<span class="currency">USD</span></div>
+          <button class="product-buy" onclick="openModal(${p.id})">
+            <i class="fa-solid fa-cart-plus"></i> Buy
+          </button>
+        </div>
+      </div>
+    `;
+    g.appendChild(d);
+    setTimeout(() => { d.style.opacity = '1'; d.style.transform = 'translateY(0)'; }, 80 + i * 80);
+  });
+}
+render();
+
+// ===== FAQ =====
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const open = item.classList.contains('open');
+  document.querySelectorAll('.faq').forEach(f => f.classList.remove('open'));
+  if (!open) item.classList.add('open');
+}
+
+function playBuySound() {
+  const audio = document.getElementById('buySound');
+  if (audio) {
+    audio.currentTime = 0;
+    audio.play().catch(e => console.log('Audio play failed:', e));
+  }
+}
+
+// ===== PURCHASE MODAL =====
+function openModal(id) {
+  playBuySound();
+  currentProduct = products.find(p => p.id === id);
+  if (!currentProduct) return;
+  currentQty = 1;
+  document.getElementById('mProduct').textContent = currentProduct.name;
+  document.getElementById('mQuantity').textContent = '1x';
+  document.getElementById('mPrice').textContent = '$' + currentProduct.price + ' USD';
+  document.getElementById('orderQty').value = '1';
+  document.getElementById('upFile').value = '';
+  walletFile = null;
+  resetUp();
+  document.getElementById('tgUser').value = '';
+  document.getElementById('modal').classList.add('active');
+  cartCount++;
+  updateCartBadge();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+function updateTotal() {
+  currentQty = parseInt(document.getElementById('orderQty').value) || 1;
+  document.getElementById('mQuantity').textContent = currentQty + 'x';
+  const total = currentProduct.price * currentQty;
+  document.getElementById('mPrice').textContent = '$' + total + ' USD';
+}
+
+function previewImg(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  walletFile = file;
+  const zone = document.getElementById('upZone');
+  const r = new FileReader();
+  r.onload = ev => {
+    zone.innerHTML = `<img src="${ev.target.result}" alt="Proof">`;
+    zone.classList.add('has-img');
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.id = 'upFile';
+    inp.accept = 'image/*';
+    inp.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;';
+    inp.onchange = previewImg;
+    zone.appendChild(inp);
+  };
+  r.readAsDataURL(file);
+}
+
+function resetUp() {
+  const z = document.getElementById('upZone');
+  z.classList.remove('has-img');
+  z.innerHTML = `
+    <i class="fa-solid fa-cloud-arrow-up"></i>
+    <div class="up-text">Upload Payment Proof<br><small>Click or drag image here</small></div>
+    <input type="file" id="upFile" accept="image/*" onchange="previewImg(event)">
+  `;
+}
+const upZone = document.getElementById('upZone');
+upZone.addEventListener('dragover', e => { e.preventDefault(); upZone.style.borderColor = 'var(--accent)'; });
+upZone.addEventListener('dragleave', e => { e.preventDefault(); upZone.style.borderColor = ''; });
+upZone.addEventListener('drop', e => {
+  e.preventDefault(); upZone.style.borderColor = '';
+  const files = e.dataTransfer.files;
+  if (files.length) {
+    const inp = document.getElementById('upFile');
+    const dt = new DataTransfer();
+    dt.items.add(files[0]);
+    inp.files = dt.files;
+    previewImg({ target: inp });
+  }
+});
+
+function copyAddr(el, type) {
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const tip = document.getElementById(type + 'Tip');
+    tip.textContent = 'Copied!';
+    tip.style.color = 'var(--success)';
+    setTimeout(() => { tip.textContent = 'Click to copy'; tip.style.color = ''; }, 2000);
+  });
+}
+
+async function sendOrder() {
+  const tg = document.getElementById('tgUser').value.trim();
+  const btn = document.getElementById('sBtn');
+  if (!walletFile) { alert('Upload payment proof image.'); return; }
+  if (!tg) { alert('Enter your Telegram username.'); return; }
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const order = {
+    id: Date.now(),
+    product: currentProduct.name,
+    price: currentProduct.price,
+    quantity: currentQty,
+    total: currentProduct.price * currentQty,
+    telegram: tg,
+    date: new Date().toLocaleString(),
+    proof: null
+  };
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    order.proof = e.target.result;
+    let orders = JSON.parse(localStorage.getItem('flex_orders') || '[]');
+    orders.push(order);
+    localStorage.setItem('flex_orders', JSON.stringify(orders));
+
+    try {
+      await sendToTelegram(order, e.target.result);
+    } catch(err) {
+      console.log('Telegram send failed:', err);
+    }
+
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      closeModal();
+      document.getElementById('success').classList.add('active');
+      updateCartBadge();
+    }, 800);
+  };
+  reader.readAsDataURL(walletFile);
+}
+
+async function sendToTelegram(order, proofBase64) {
+  const message = `
+<b>NEW ORDER!</b>
+
+<b>Product:</b> ${order.product}
+<b>Quantity:</b> ${order.quantity}x
+<b>Price:</b> $${order.total} USD
+<b>Telegram:</b> ${order.telegram}
+<b>Date:</b> ${order.date}
+<b>Order ID:</b> #${order.id}
+  `;
+
+  try {
+    const msgRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML'
+      })
+    });
+    const msgData = await msgRes.json();
+    console.log('Telegram text response:', msgData);
+
+    const base64Response = await fetch(proofBase64);
+    const blob = await base64Response.blob();
+
+    const formData = new FormData();
+    formData.append('chat_id', TELEGRAM_CHAT_ID);
+    formData.append('photo', blob, 'payment-proof.png');
+    formData.append('caption', `Payment Proof - Order #${order.id}`);
+
+    const photoRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+      method: 'POST',
+      body: formData
+    });
+    const photoData = await photoRes.json();
+    console.log('Telegram photo response:', photoData);
+
+    if (!msgData.ok) throw new Error('Text message failed: ' + JSON.stringify(msgData));
+    if (!photoData.ok) throw new Error('Photo send failed: ' + JSON.stringify(photoData));
+
+  } catch (err) {
+    console.error('Telegram send error:', err);
+    throw err;
+  }
+}
+
+function closeSuccess() {
+  document.getElementById('success').classList.remove('active');
+}
+
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('success').addEventListener('click', e => { if (e.target === e.currentTarget) closeSuccess(); });
+
+// ===== CART MODAL =====
+function openCartModal() {
+  const list = document.getElementById('cartOrdersList');
+  const orders = JSON.parse(localStorage.getItem('flex_orders') || '[]');
+
+  if (orders.length === 0) {
+    list.innerHTML = `
+      <div class="empty-cart">
+        <i class="fa-solid fa-inbox"></i>
+        <p>You haven't placed any orders yet.</p>
+      </div>
+    `;
+  } else {
+    list.innerHTML = orders.slice().reverse().map((o, idx) => `
+      <div class="order-history-item">
+        <div class="oh-product">${o.product}</div>
+        <div class="oh-meta">
+          <span><i class="fa-solid fa-hashtag"></i> ${o.quantity || 1}x</span>
+          <span><i class="fa-brands fa-telegram"></i> ${o.telegram}</span>
+          <span><i class="fa-regular fa-clock"></i> ${o.date}</span>
+        </div>
+        <div class="oh-price">$${o.total || o.price} USD</div>
+        ${o.proof ? `<div class="oh-proof"><img src="${o.proof}" alt="Payment Proof" onclick="window.open(this.src)"></div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('cartModal').classList.add('active');
+}
+
+function closeCartModal() {
+  document.getElementById('cartModal').classList.remove('active');
+}
+
+document.getElementById('cartModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeCartModal();
+});
+
+// ===== CART BADGE =====
+function updateCartBadge() {
+  const orders = JSON.parse(localStorage.getItem('flex_orders') || '[]');
+  const totalItems = orders.reduce((sum, o) => sum + (o.quantity || 1), 0);
+  document.getElementById('cartCount').textContent = totalItems;
+  cartCount = totalItems;
+}
+
+// ===== ABOUT TOOLS =====
+const toolDescriptions = {
+  'xray-checker': {
+    title: 'Xray Checker',
+    icon: 'fa-solid fa-radiation',
+    badge: 'Security',
+    desc: `🚀 <b>Xray Checker</b> is an all-in-one powerful tool that scans and validates multiple account details across different platforms in one go!<br><br>
+
+<b>🔍 What Xray Checker can do:</b><br><br>
+
+✅ <b>Hotmail Checker</b> – Verifies if Hotmail/Outlook accounts are active and working.<br>
+✅ <b>Balance Checker</b> – Checks account balances (Microsoft Rewards points, gift card balances, etc.).<br>
+✅ <b>Minecraft Checker</b> – Validates Minecraft accounts, checks username, UUID, capes (Optifine), name change availability, and multiplayer ban status.<br>
+✅ <b>Xbox Code Fetcher</b> – Automatically searches for Xbox gift card codes and Game Pass trial codes hidden inside emails.<br>
+✅ <b>Payment Method Checker</b> – Detects linked payment methods like credit cards, PayPal, and subscription statuses.<br>
+✅ <b>Country Checker</b> – Identifies the account's country/region based on Microsoft account data.<br><br>
+
+<b>⚡ Perfect for:</b><br>
+- Finding valuable accounts with active subscriptions<br>
+- Checking Microsoft account status in bulk<br>
+- Discovering hidden gift card codes in email inboxes<br>
+- Quick validation of multiple account types at once<br><br>
+
+All results are saved neatly and organized by category for easy access!`
+  },
+  'xbox-checker': {
+    title: 'Xbox Game Pass Checker',
+    icon: 'fa-brands fa-xbox',
+    badge: 'Gaming',
+    desc: `My Xbox Checker is a sleek and eye-catching accessory that adds a stylish touch to my gaming setup. It is not a game finder—it is all about the look! With its cool design and flashy details, it stands out next to my Xbox and grabs attention every time. Whether I am playing via Xbox Game Pass, EA Play, or Ubisoft+, my Checker makes the whole experience feel more premium and fun.`
+  },
+  'minecraft': {
+    title: 'Minecraft Checker',
+    icon: 'fa-solid fa-cube',
+    badge: 'Gaming',
+    desc: `My Minecraft Checker is a smart tool that checks all the details of a Minecraft account. It tells me if the account owns Minecraft, what its username is, its UUID, what capes it has (including Optifine!), if a name change is available, and if it is banned from multiplayer. It also checks Xbox and Game Pass status, Hypixel stats (like Bedwars stars and SkyWars wins), and even DonutSMP whitelist. It is a complete checker for everything Minecraft-related!`
+  },
+  'hotmail': {
+    title: 'Hotmail Checker',
+    icon: 'fa-solid fa-envelope',
+    badge: 'Email',
+    desc: `My Hotmail Checker is a powerful tool that checks Outlook/Hotmail accounts to see if they are working. It does way more than just login testing — it scans for Xbox Game Pass, Microsoft Rewards points, Xbox gift card codes hidden in emails, active subscriptions (like Office 365, EA Play, Minecraft Realms), and even payment methods like credit cards or PayPal. It also sorts results by country and saves everything neatly into organized files. Basically, it is an all-in-one account checker for Microsoft-related goodies!`
+  },
+  'xbox-fetcher': {
+    title: 'Xbox Code Fetcher',
+    icon: 'fa-solid fa-gift',
+    badge: 'Gaming',
+    desc: `My Xbox Code Fetcher is a smart tool that automatically searches through Outlook/Hotmail accounts to find and extract Xbox gift card codes, Game Pass trial codes, and Microsoft Rewards redemption codes hidden inside emails. It scans inbox folders, including trash/deleted items, looking for patterns like XXXXX-XXXXX-XXXXX-XXXXX-XXXXX. Once it finds any codes, it saves them all in one place so I can redeem them instantly on my Xbox console. No more manually searching through hundreds of emails — this fetcher does all the work for me in seconds!`
+  },
+  'netflix': {
+    title: 'Netflix Checker',
+    icon: 'fa-solid fa-film',
+    badge: 'Streaming',
+    desc: `My Netflix Checker is a smart tool that checks Outlook/Hotmail accounts to find Netflix-related emails. It logs into the account, scans the inbox for messages from Netflix (like purchase confirmations, account updates, or subscription receipts), and extracts useful info like birthday and age from the user profile. If it finds Netflix emails, it saves the account as a "Netflix hit" along with details like purchase dates, prices, and item names. It is perfect for finding accounts that have active Netflix subscriptions or purchase history!`
+  },
+  'inbox': {
+    title: 'Hotmail Inbox',
+    icon: 'fa-solid fa-inbox',
+    badge: 'Email',
+    desc: `My Hotmail Inboxer is a powerful tool that logs into Outlook/Hotmail accounts and scans the inbox to detect which online services are registered with that email. It checks for over 30+ popular services like Facebook, Instagram, Netflix, Spotify, Xbox, Amazon, PayPal, Discord, Steam, and many more! For each service found, it shows how many emails exist and a preview of the latest message. It also extracts the account profile info like name, country, and birthday. All results are saved neatly into service-specific folders, making it super easy to see which accounts have valuable subscriptions!`
+  },
+  'cookies': {
+    title: 'Cookies Checker Pack',
+    icon: 'fa-solid fa-cookie-bite',
+    badge: 'Utility',
+    desc: `My Cookie Checkers Collection is a set of powerful tools that check cookies from various platforms to find valid premium accounts. It includes checkers for: Claude AI (finds Pro/Team accounts), Cursor (detects paid subscriptions), ChatGPT (finds Plus/Pro plans), eBay (detects seller accounts with feedback), Netflix (generates NFTokens for streaming), Prime Video (finds active Prime memberships), Spotify (detects Premium plans - Individual/Duo/Family), TikTok (finds accounts with follower stats). All tools support mass checking, proxy support, multi-threading, Telegram notifications, and save results neatly into organized folders. Perfect for finding valuable accounts across multiple platforms!`
+  },
+  'psn': {
+    title: 'PSN Checker',
+    icon: 'fa-brands fa-playstation',
+    badge: 'Gaming',
+    desc: `My PSN Account Checker is a powerful tool that checks Outlook/Hotmail accounts to find PlayStation Network (PSN) activity. It logs into Microsoft accounts, scans the inbox for emails from Sony/PlayStation, and extracts valuable info like PSN Online IDs, game purchases, order numbers, spent amounts, PS Plus subscriptions, and even wallet top-ups. It ranks accounts based on activity (PREMIUM/GOOD/BASIC/LOW) and saves everything neatly. Perfect for finding PSN-linked accounts with purchase history and active subscriptions!`
+  }
+};
+
+function showToolDesc(toolKey) {
+  const tool = toolDescriptions[toolKey];
+  if (!tool) return;
+
+  document.querySelector('.tools-selector').style.display = 'none';
+  const panel = document.getElementById('toolDescPanel');
+  const content = document.getElementById('toolDescContent');
+
+  content.innerHTML = `
+    <h3><i class="${tool.icon}" style="color:var(--accent);"></i> ${tool.title} <span class="tool-badge">${tool.badge}</span></h3>
+    <p style="font-size:15px;line-height:2;color:var(--text-2);">${tool.desc}</p>
+    <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;">
+      <a class="btn-glow" onclick="showHome(); setTimeout(()=>document.getElementById('catalog').scrollIntoView({behavior:'smooth'}),100);">
+        <i class="fa-solid fa-cart-plus"></i> Get This Tool
+      </a>
+      <button class="btn-home" onclick="showHome();"><i class="fa-solid fa-house"></i> Home</button>
+    </div>
+  `;
+
+  panel.style.display = 'block';
+}
+
+function hideToolDesc() {
+  document.querySelector('.tools-selector').style.display = 'grid';
+  document.getElementById('toolDescPanel').style.display = 'none';
+}
+
+// ===== OWNER PANEL =====
+function checkOwnerPass() {
+  const pass = document.getElementById('ownerPass').value;
+  if (pass === 'anesgg') {
+    document.getElementById('ownerLogin').style.display = 'none';
+    document.getElementById('ordersPanel').style.display = 'block';
+    document.getElementById('loginError').style.display = 'none';
+    loadOrders();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('ownerPass').value = '';
+    document.getElementById('ownerPass').focus();
+  }
+}
+
+function logoutOwner() {
+  document.getElementById('ownerLogin').style.display = 'block';
+  document.getElementById('ordersPanel').style.display = 'none';
+  document.getElementById('ownerPass').value = '';
+}
+
+function loadOrders() {
+  const orders = JSON.parse(localStorage.getItem('flex_orders') || '[]');
+  const list = document.getElementById('ordersList');
+  const stats = document.getElementById('ordersStats');
+
+  const totalRevenue = orders.reduce((s, o) => s + (o.total || o.price || 0), 0);
+  const totalOrders = orders.length;
+  const uniqueProducts = new Set(orders.map(o => o.product)).size;
+  const avgOrder = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
+
+  stats.innerHTML = `
+    <div class="stat-card"><div class="num">${totalOrders}</div><div class="lbl">Total Orders</div></div>
+    <div class="stat-card"><div class="num">$${totalRevenue}</div><div class="lbl">Revenue</div></div>
+    <div class="stat-card"><div class="num">${uniqueProducts}</div><div class="lbl">Products</div></div>
+    <div class="stat-card"><div class="num">$${avgOrder}</div><div class="lbl">Avg Order</div></div>
+  `;
+
+  if (orders.length === 0) {
+    list.innerHTML = '<div class="no-orders"><i class="fa-solid fa-inbox" style="font-size:40px;color:var(--text-3);margin-bottom:12px;display:block;"></i>No orders yet.</div>';
+    return;
+  }
+
+  list.innerHTML = orders.slice().reverse().map((o, i) => `
+    <div class="order-item">
+      <div class="o-product"><i class="fa-solid fa-box" style="color:var(--accent);margin-right:6px;"></i>${o.product}</div>
+      <div class="o-qty">${o.quantity || 1}x</div>
+      <div class="o-price">$${o.total || o.price} USD</div>
+      <div class="o-tg"><i class="fa-brands fa-telegram" style="margin-right:4px;"></i>${o.telegram}</div>
+      <div class="o-date">${o.date}</div>
+      ${o.proof ? `<div class="o-proof"><img src="${o.proof}" alt="Payment Proof" onclick="window.open(this.src)"></div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ===== INIT =====
+updateCartBadge();
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeCartModal();
+  }
+});
+</script>
+
+</body>
+</html>
